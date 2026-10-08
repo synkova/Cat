@@ -12,6 +12,7 @@ class YandexDiskUploader:
         }
 
     def create_folder(self, folder_name: str):
+        #Создаем папку на Яндекс.Диске, если она еще не создана.
         params = {'path': folder_name}
         response = requests.put(self.base_url, headers=self.headers, params=params)
         # 201 - создана, 409 - уже существует
@@ -21,6 +22,7 @@ class YandexDiskUploader:
         return False
 
     def upload_file(self, folder_name: str, file_name: str, file_content: bytes):
+        #Загружаем файл в указанную папку на Яндекс.Диске.
         upload_url_endpoint = f"{self.base_url}/upload"
         disk_path = f"{folder_name}/{file_name}"
         params = {'path': disk_path, 'overwrite': 'true'}
@@ -39,7 +41,7 @@ class YandexDiskUploader:
 
 
 def get_cat_image(text: str) -> bytes:
-    # Получает изображение кота с текстом через API cataas.com
+    #Получаем изображение кота с текстом через API cataas.com.
     url = f"https://cataas.com/cat/says/{text}"
     response = requests.get(url)
     if response.status_code == 200:
@@ -48,12 +50,12 @@ def get_cat_image(text: str) -> bytes:
 
 
 def main():
-    # 1. Ввод данных
+    # 1. Ввод данных от пользователя
     token = input("Введите токен Яндекс.Диска (Полигон): ").strip()
     text = input("Введите текст для картинки с котом: ").strip()
-    
+    group_name = input("Введите название вашей группы (например, py-105): ").strip()
 
-    if not token or not text:
+    if not token or not text or not group_name:
         print("Ошибка: все поля должны быть заполнены.")
         return
 
@@ -67,11 +69,11 @@ def main():
 
     # 4. Загрузка на Яндекс.Диск
     uploader = YandexDiskUploader(token)
-    print(f"Создаем папку на Яндекс.Диске...")
-    uploader.create_folder
+    print(f"Создаем папку '{group_name}' на Яндекс.Диске...")
+    uploader.create_folder(group_name)
 
     print(f"Загружаем файл '{file_name}'...")
-    if uploader.upload_file(file_name, image_bytes):
+    if uploader.upload_file(group_name, file_name, image_bytes):
         print("Файл успешно загружен на Яндекс.Диск!")
 
         # 5. Сохранение информации о файле в json
